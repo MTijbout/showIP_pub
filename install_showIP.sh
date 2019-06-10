@@ -1,21 +1,23 @@
 #!/bin/sh
-## Version 1.0.0
+#!/bin/bash
+#############################################################################
+# Filename: install_showIP.sh
+# Date Created: 03/15/19
+# Author: Marco Tijbout
 #
-# Campaign: showip
+# Version 1.0
 #
-dirname=$(echo `echo $(dirname "$0")`)
-cd $dirname
+# Description:  Script to install the showIP service and required files to
+#               show the IP address on the SenseHAT attached to the Raspberry Pi.
+#
+#############################################################################
 
-export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-LOGFILE="/tmp/campaign-showip.log"
-echo "This is the script: execute" >> $LOGFILE
+LOGFILE="/tmp/install_showIP.log"
+echo "This is the script: install_showIP.sh" >> $LOGFILE
 
-################### Script Starts Here ###################
 USERID=$(logname)
 echo "The original executer: $USERID" 2>&1 | tee -a $LOGFILE
-USERID2=$(whoami)
-echo "The executer: $USERID2" 2>&1 | tee -a $LOGFILE
 
 SERVICE=showip.service
 DIRECTORY=/opt/scripts

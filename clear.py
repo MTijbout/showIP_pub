@@ -3,7 +3,7 @@
 # Date Created: 03/15/19
 # Author: Marco Tijbout
 # Description: Clear the SenseHat display.
-# Usage: Store this script in /home/pi/scripts
+# Usage: Store this script in /opt/scripts
 #############################################################################
 
 import os

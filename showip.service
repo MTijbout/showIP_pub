@@ -1,0 +1,15 @@
+Description=Show IP Address at boot service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/scripts
+ExecStart=/opt/scripts/showip.sh
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target

@@ -1,12 +1,9 @@
 #############################################################################
 # Filename: showip.py
-# Date Created: 03/10/19
-# Author: Ken Osborn
 #
 # Version 1.1
 #
-# Description: Display IP address on SenseHat until middle Joystick button is
-#              pressed, useful when demoing Pulse/RPi in headless mode.
+# Description: Display IP address on SenseHat useful when demoing Pulse/RPi in headless mode.
 #
 # Usage: Store this script in /opt/scripts
 #

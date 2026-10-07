@@ -1,0 +1,11 @@
+# Server-side gitleaks scan. Logic lives in MTijbout/gitleaks_implementation.
+name: gitleaks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scan:
+    uses: MTijbout/gitleaks_implementation/.github/workflows/gitleaks-reusable.yml@main

@@ -59,7 +59,7 @@ jobs:
           TOML
             echo "path=$RUNNER_TEMP/gitleaks-fallback.toml" >> "$GITHUB_OUTPUT"
           fi
-      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # tag v2 on 2026-10-07 (commit dated 2025-04-17)
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # tag v3.0.0 (node24), pinned 2026-10-07
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_COMMENTS: "false"

@@ -1,4 +1,6 @@
-# Server-side gitleaks scan. Logic lives in MTijbout/gitleaks_implementation.
+# Standalone server-side gitleaks scan, for PUBLIC repos: a public repo cannot call
+# a reusable workflow that lives in a private repo. Generated from
+# .github/workflows/gitleaks-reusable.yml; keep the embedded config in sync.
 name: gitleaks
 on:
   push:
@@ -8,4 +10,57 @@ permissions:
   contents: read
 jobs:
   scan:
-    uses: MTijbout/gitleaks_implementation/.github/workflows/gitleaks-reusable.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pick config
+        id: cfg
+        env:
+          INPUT_CONFIG: ""
+        run: |
+          if [ -n "$INPUT_CONFIG" ]; then
+            echo "path=$INPUT_CONFIG" >> "$GITHUB_OUTPUT"
+          elif [ -f .gitleaks.toml ]; then
+            echo "path=.gitleaks.toml" >> "$GITHUB_OUTPUT"
+          else
+            cat > "$RUNNER_TEMP/gitleaks-fallback.toml" <<'TOML'
+          # Global fallback gitleaks config.
+          # Used by the global hooks when a repo has no .gitleaks.toml of its own.
+          # A repo's own .gitleaks.toml always takes precedence (e.g. the chezmoi repo,
+          # which allowlists .age files and op:// references).
+
+          title = "global gitleaks fallback"
+
+          [extend]
+              # Inherit gitleaks' default rules. Never disable these globally.
+              useDefault = true
+
+          [[allowlists]]
+              description = "Bundled Obsidian plugin code: variable names that look like keys"
+              # Narrow on purpose: only the noisy generic rule, only plugin bundles.
+              # Provider-specific rules (ghp_, sk-, hf_ ...) still fire inside a main.js.
+              targetRules = ["generic-api-key"]
+              paths = ['''\.obsidian/plugins/[^/]+/main\.js$''']
+
+          [[rules]]
+              id          = "age-private-identity"
+              description = "age private key (AGE-SECRET-KEY-1...), must never be committed"
+              regex       = '''AGE-SECRET-KEY-1[0-9A-Z]{50,70}'''
+              keywords    = ["age-secret-key-1"]
+              entropy     = 3.0
+
+          [[rules]]
+              id          = "ssh-private-key-body"
+              description = "Unencrypted private key block"
+              regex       = '''-----BEGIN (RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY( BLOCK)?-----'''
+              keywords    = ["-----begin"]
+          TOML
+            echo "path=$RUNNER_TEMP/gitleaks-fallback.toml" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_CONFIG: ${{ steps.cfg.outputs.path }}
